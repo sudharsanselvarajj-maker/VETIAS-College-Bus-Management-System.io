@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Student Portal | VET IAS Bus System</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- QR Scanner Lib -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --bg-light: #f8f9fc;
+            --text-dark: #2b2d42;
+            --text-muted: #8d99ae;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Glass Navbar */
+        .navbar {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            color: var(--text-dark) !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            border-radius: 12px;
+            margin: 0 0.2rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(67, 97, 238, 0.08);
+            color: var(--primary) !important;
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+        }
+
+        /* Container */
+        main {
+            padding-top: 100px !important;
+        }
+
+        /* Premium Cards */
+        .card {
+            border: none;
+            border-radius: 24px;
+            background: white;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Table */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: var(--bg-light);
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1rem 1.5rem;
+        }
+
+        .table tbody td {
+            padding: 1.25rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        /* QR Frame */
+        .qr-frame {
+            border: 2px dashed #d1d9e6;
+            background: #fbfcfe;
+            border-radius: 20px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Form Controls */
+        .form-control,
+        .form-select {
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            border-color: var(--primary);
+            background-color: white;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Section Transitions */
+        section {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom Badge */
+        .badge-custom {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Toast Container -->
+    <div id="toast-container" style="position: fixed; top: 100px; right: 20px; z-index: 9999;"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{{ url_for('static', filename='VET-IAS-Logo3-1.png') }}" alt="Logo"
+                    style="height: 42px; margin-right: 12px;">
+                <span class="brand-text">VET IAS Student</span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <i class="bi bi-list fs-1 text-primary"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" onclick="showSection('dashboard')">
+                            <i class="bi bi-grid-fill"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showSection('attendance')">
+                            <i class="bi bi-qr-code-scan"></i> Attendance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showSection('complaints')">
+                            <i class="bi bi-chat-left-dots-fill"></i> Complaints
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-4">
+                        <a href="/logout" class="btn btn-outline-danger btn-sm px-4 rounded-pill">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- === DASHBOARD VIEW === -->
+        <section id="dashboard">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-8">
+                    <h1 class="fw-bold mb-1">Student Portal</h1>
+                    <p class="text-muted mb-0">Welcome back, <strong>{{ student.name }}</strong></p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <button class="btn btn-outline-primary shadow-sm rounded-pill" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise me-2"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card stat-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-label">Attendance Rate</div>
+                                <div class="stat-value">{{ (history|length * 10) }}%</div>
+                                <div class="mt-2 small text-success">
+                                    <i class="bi bi-shield-check me-1"></i> Good Standing
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-pie-chart-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-label">Fee Status</div>
+                                <div class="stat-value">
+                                    {% if student.fee_status == 'Paid' %}
+                                    <span class="text-success">Paid</span>
+                                    {% elif student.fee_status == 'Pending' %}
+                                    <span class="text-warning">Pending</span>
+                                    {% else %}
+                                    <span class="text-danger">Unpaid</span>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-2 small text-muted">
+                                    Spring 2026
+                                </div>
+                            </div>
+                            <div class="stat-icon" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71;">
+                                <i class="bi bi-credit-card-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-label">Assigned Bus</div>
+                                <div class="stat-value">{{ student.bus_no }}</div>
+                                <div class="mt-2 small text-muted">
+                                    Main Campus Route
+                                </div>
+                            </div>
+                            <div class="stat-icon" style="background: rgba(241, 196, 15, 0.1); color: #f1c40f;">
+                                <i class="bi bi-bus-front-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Table -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header border-0 bg-white">
+                    <span class="fw-bold">Recent Attendance History</span>
+                    <button class="btn btn-sm text-primary p-0" onclick="showSection('attendance')">Scan Now</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Bus ID</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if history %}
+                            {% for log in history[:5] %}
+                            <tr>
+                                <td class="fw-medium">{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill border">{{ log.bus_no
+                                        }}</span></td>
+                                <td class="text-muted">QR Scan</td>
+                                <td>
+                                    <span class="badge-custom bg-success bg-opacity-10 text-success">Verified</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">No attendance records found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- === ATTENDANCE VIEW === -->
+        <section id="attendance" class="d-none">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="text-center mb-5">
+                        <h2 class="fw-bold">Mark Attendance</h2>
+                        <p class="text-muted">Position your camera over the driver's QR code.</p>
+                    </div>
+
+                    <div class="card p-4 p-lg-5 text-center">
+                        <div id="qr-reader" class="qr-frame mb-4" style="display:none;"></div>
+                        <div id="result-area" class="mb-3 fw-bold text-primary"></div>
+
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-primary btn-lg py-3" onclick="startScan()">
+                                <i class="bi bi-camera-fill me-2"></i> Launch Scanner
+                            </button>
+                            <button class="btn btn-outline-secondary btn-lg py-3 rounded-4"
+                                onclick="showSection('dashboard')">Back to Dashboard</button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="alert alert-primary border-0 rounded-4 d-flex align-items-center p-4 mt-4 bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                        <small class="fw-medium">Please ensure GPS is enabled. Attendance verification requires you to
+                            be within 15 meters of the bus stop check-in point.</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === COMPLAINTS VIEW === -->
+        <section id="complaints" class="d-none">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center mb-5">
+                        <h2 class="fw-bold">Complaint Center</h2>
+                        <p class="text-muted">Report any issues regarding bus service, safety, or cleanliness.</p>
+                    </div>
+
+                    <div class="card p-4 p-lg-5 shadow-sm border-0">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted small uppercase spacing-1">ISSUE SUBJECT</label>
+                            <select id="complaint-subject" class="form-select border-0 bg-light py-3 px-4">
+                                <option value="Bus Delay">Bus Delay</option>
+                                <option value="Driver Behavior">Driver Behavior</option>
+                                <option value="Overcrowding">Overcrowding</option>
+                                <option value="Cleanliness">Cleanliness</option>
+                                <option value="Lost Item">Lost Item</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted small uppercase spacing-1">DETAILED
+                                DESCRIPTION</label>
+                            <textarea id="complaint-text" class="form-control border-0 bg-light p-4" rows="5"
+                                placeholder="Please provide specific details like time, location, etc."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end pt-2">
+                            <button class="btn btn-primary px-5 py-3 rounded-4" onclick="submitComplaint()">
+                                <i class="bi bi-send-fill me-2"></i> Submit Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-5 text-center py-5 border-top bg-white">
+        <p class="text-muted small mb-0">&copy; 2026 VET IAS College Bus Management System. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+    <script>
+        // Tab Switching Logic
+        function showSection(sectionId) {
+            document.querySelectorAll("section[id]").forEach(s => s.classList.add("d-none"));
+            document.getElementById(sectionId).classList.remove("d-none");
+
+            // Update Nav State
+            document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+
+            // Handle clicking via code or link
+            const links = document.querySelectorAll(".nav-link");
+            links.forEach(l => {
+                if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(sectionId)) {
+                    l.classList.add('active');
+                }
+            });
+        }
+
+        // --- Bridge Logic ---
+        function startScan() {
+            document.getElementById('qr-reader').style.display = 'flex';
+            if (typeof StudentApp !== 'undefined') {
+                StudentApp.startScanner();
+            } else {
+                showToast("Scanner module loading...", "error");
+            }
+        }
+
+        async function submitComplaint() {
+            const subject = document.getElementById('complaint-subject').value;
+            const msg = document.getElementById('complaint-text').value;
+
+            if (!msg) {
+                if (typeof showToast !== 'undefined') showToast("Please write a message", "error");
+                else alert("Please write a message");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/submit-complaint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject: subject, message: msg })
+                });
+
+                if (response.ok) {
+                    document.getElementById('complaint-text').value = "";
+                    if (typeof showToast !== 'undefined') showToast("Complaint Submitted Successfully", "success");
+                    else alert("Complaint Submitted Successfully");
+                    setTimeout(() => location.reload(), 3000);
+                } else {
+                    throw new Error("Failed to submit");
+                }
+            } catch (err) {
+                if (typeof showToast !== 'undefined') showToast("Submission failed. Try again.", "error");
+                else alert("Submission failed. Try again.");
+            }
+        }
+
+        // Toast Support is handled by scripts.js, but we can verify it
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-3 mb-2 rounded-4 shadow-lg text-white d-flex align-items-center animate__animated animate__fadeInRight`;
+            toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
+            toast.style.minWidth = '280px';
+
+            toast.innerHTML = `
+                <div class="me-3 fs-3">
+                    <i class="bi bi-${type === 'error' ? 'exclamation-circle' : 'check-circle'}-fill"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">${type === 'error' ? 'Error' : 'Success'}</h6>
+                    <p class="mb-0 small opacity-75">${msg}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3500);
+        }
+    </script>
+</body>
+
+</html>

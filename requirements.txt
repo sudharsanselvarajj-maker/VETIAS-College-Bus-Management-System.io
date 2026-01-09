@@ -1,0 +1,6 @@
+flask
+flask-sqlalchemy
+flask-session
+qrcode
+pillow
+email-validator

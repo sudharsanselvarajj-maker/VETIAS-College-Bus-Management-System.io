@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Portal | VET IAS Bus System</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --bg-light: #f8f9fc;
+            --text-dark: #2b2d42;
+            --text-muted: #8d99ae;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Glass Navbar */
+        .navbar {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Admin Navbar Refinement */
+        .admin-nav-btn {
+            color: var(--text-dark) !important;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem !important;
+            border-radius: 12px;
+            margin: 0 0.2rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .admin-nav-btn:hover {
+            background: rgba(67, 97, 238, 0.08);
+            color: var(--primary) !important;
+        }
+
+        .admin-nav-btn.active {
+            background: var(--primary) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+        }
+
+        /* Layout */
+        main {
+            padding-top: 100px !important;
+        }
+
+        /* Semantic Cards */
+        .card {
+            border: none;
+            border-radius: 24px;
+            background: white;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Table Aesthetics */
+        .table thead th {
+            background: var(--bg-light);
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .table tbody td {
+            padding: 1.25rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        /* Professional Stat Cards */
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        /* Buttons & Badges */
+        .btn-action {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .badge-pill-custom {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        /* Search Input Styling */
+        .search-container {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8d99ae;
+        }
+
+        .search-container .form-control {
+            padding-left: 35px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        .search-container .form-control:focus {
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Animation */
+        section {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Message Container -->
+    <div id="toast-container" style="position: fixed; top: 100px; right: 20px; z-index: 9999;"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+        <div class="container">
+            <header class="d-flex align-items-center">
+                <img src="{{ url_for('static', filename='VET-IAS-Logo3-1.png') }}" alt="VET IAS"
+                    style="height: 42px; margin-right: 12px;">
+                <span class="brand-text">Admin Control Panel</span>
+            </header>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <i class="bi bi-list fs-1 text-primary"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
+                    <li class="nav-item">
+                        <button class="admin-nav-btn active" data-section="dashboard">
+                            <i class="bi bi-speedometer2 me-2"></i> Summary
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="admin-nav-btn" data-section="students">
+                            <i class="bi bi-mortarboard-fill me-2"></i> Students
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="admin-nav-btn" data-section="devices">
+                            <i class="bi bi-shield-lock-fill me-2"></i> Devices
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="admin-nav-btn" data-section="attendance">
+                            <i class="bi bi-journal-check me-2"></i> Logs
+                        </button>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="/logout" class="btn btn-outline-danger btn-sm px-4 rounded-pill fw-bold">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container">
+
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard">
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h1 class="display-6 fw-bold text-dark">System Summary</h1>
+                    <p class="text-muted">Overview of daily operations and student metrics.</p>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <article class="card h-100 p-4 border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted fw-bold mb-1 small">Total Enrollment</h6>
+                                <span class="h2 fw-bold d-block">{{ students|length }}</span>
+                                <small class="text-primary fw-medium">Active Students</small>
+                            </div>
+                            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card h-100 p-4 border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted fw-bold mb-1 small">Attendance (Today)</h6>
+                                <span class="h2 fw-bold d-block text-success">{{ logs|length }}</span>
+                                <small class="text-success fw-medium">Verified check-ins</small>
+                            </div>
+                            <div class="stat-icon" style="background:rgba(46,204,113,0.1); color:#2ecc71"><i
+                                    class="bi bi-check-circle-fill"></i></div>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="card h-100 p-4 border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted fw-bold mb-1 small">System Alerts</h6>
+                                <span class="h2 fw-bold d-block text-danger">{{ complaints|length }}</span>
+                                <small class="text-danger fw-medium">Pending Complaints</small>
+                            </div>
+                            <div class="stat-icon" style="background:rgba(231,76,60,0.1); color:#e74c3c"><i
+                                    class="bi bi-exclamation-triangle-fill"></i></div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm overflow-hidden">
+                <header class="card-header bg-transparent py-3 px-4 border-0 mt-2">
+                    <h3 class="h5 fw-bold mb-0">Recent System Feedback</h3>
+                </header>
+                <div class="table-responsive">
+                    <table class="table hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if complaints %}
+                            {% for c in complaints[:5] %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ c.subject }}</td>
+                                <td class="text-muted">{{ c.message[:60] }}...</td>
+                                <td class="text-center"><span
+                                        class="badge rounded-pill text-bg-warning px-3 py-2">Open</span></td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">No feedback recorded yet.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- STUDENTS SECTION -->
+        <section id="students" class="d-none">
+            <header class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">Student Database</h2>
+                    <p class="text-muted mb-0 small">Manage fee eligibility and route assignments.</p>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="search-container">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchStudent" class="form-control form-control-sm"
+                            placeholder="Search name or bus...">
+                    </div>
+                    <button id="notifyDefaultersBtn" class="btn btn-warning btn-sm fw-bold">
+                        <i class="bi bi-bell-fill me-1"></i> Notify Defaulters
+                    </button>
+                </div>
+            </header>
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>FullName</th>
+                                <th>Email</th>
+                                <th>Mobile No</th>
+                                <th>Assigned Bus</th>
+                                <th class="text-end">Fee Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body">
+                            {% for s in students %}
+                            <tr>
+                                <td class="fw-bold">{{ s.name }}</td>
+                                <td class="small text-muted">{{ s.parent_email }}</td>
+                                <td class="small text-muted">{{ s.parent_phone or '—' }}</td>
+                                <td><span class="badge text-bg-light border px-3 py-2">{{ s.bus_no }}</span></td>
+                                <td class="text-end">
+                                    <!-- Cycles Eligibility -->
+                                    {% set fee_class = 'text-bg-warning' %}
+                                    {% if s.fee_status == 'Paid' %}{% set fee_class = 'text-bg-success' %}
+                                    {% elif s.fee_status == 'Unpaid' %}{% set fee_class = 'text-bg-danger' %}{% endif %}
+                                    <a href="/api/toggle-fee/{{ s.id }}"
+                                        class="badge-pill-custom border-0 text-decoration-none bg-opacity-10 py-2 px-3 {{ fee_class }}">
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEVICES SECTION -->
+        <section id="devices" class="d-none">
+            <header class="mb-4">
+                <h2 class="fw-bold">Security & Device Binding</h2>
+                <p class="text-muted">Administrative tools to reset student phone links.</p>
+            </header>
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Active Hardware ID</th>
+                                <th>Security State</th>
+                                <th class="text-end">Security Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="device-management-body">
+                            {% for s in students %}
+                            <tr>
+                                <td class="fw-bold">{{ s.name }}</td>
+                                <td><code class="text-muted">{{ s.device_id or 'IDENTITY_NOT_CAPTURED' }}</code></td>
+                                <td>
+                                    {% if s.device_id %}
+                                    <span
+                                        class="badge-pill-custom text-bg-primary bg-opacity-10 text-primary">HARDWARE_LOCKED</span>
+                                    {% else %}
+                                    <span
+                                        class="badge-pill-custom text-bg-warning bg-opacity-10 text-warning">WAITING_HANDSHAKE</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-action btn-danger btn-sm reset-device-trigger"
+                                        data-id="{{ s.id }}" data-name="{{ s.name }}">
+                                        <i class="bi bi-shield-slash-fill me-1"></i> Reset Device
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ATTENDANCE SECTION -->
+        <section id="attendance" class="d-none">
+            <header class="mb-4">
+                <h2 class="fw-bold">Attendance Analytics Log</h2>
+                <p class="text-muted">Chronological audit of student boarding events.</p>
+            </header>
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Student</th>
+                                <th>Bus</th>
+                                <th>Verification</th>
+                                <th>Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td class="text-muted small">{{ log.timestamp.strftime('%d %b %Y, %H:%M') }}</td>
+                                <td class="fw-bold">{{ log.student_name }}</td>
+                                <td><span class="badge text-bg-light border">{{ log.bus_no }}</span></td>
+                                <td>
+                                    {% if log.loc_verified %}
+                                    <span class="text-success fw-bold"><i class="bi bi-geo-alt-fill"></i>
+                                        GEO_SUCCESS</span>
+                                    {% else %}
+                                    <span class="text-warning fw-bold"><i class="bi bi-exclamation-circle-fill"></i>
+                                        MANUAL_BYPASS</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-uppercase fw-bold text-muted">{{ log.method }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-5 py-5 border-top bg-white">
+        <div class="container text-center">
+            <p class="text-muted small mb-0">&copy; 2026 VET IAS College Transport Authority. Professional Grade
+                Security.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // -- Navigation Logic --
+            const navLinks = document.querySelectorAll('.admin-nav-btn');
+            const sections = document.querySelectorAll('main section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetSection = link.getAttribute('data-section');
+
+                    // Update Active Link
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    // Switch Section
+                    sections.forEach(s => s.classList.add('d-none'));
+                    document.getElementById(targetSection).classList.remove('d-none');
+                });
+            });
+
+            // -- Fee SMS Logic --
+            document.querySelectorAll('.send-fee-sms-trigger').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const sid = btn.getAttribute('data-id');
+                    const sname = btn.getAttribute('data-name');
+
+                    if (confirm(`Trigger manual SMS fee reminder for ${sname}?`)) {
+                        try {
+                            const res = await fetch(`/api/send-fee-sms/${sid}`, { method: 'POST' });
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                showToast(data.message);
+                            } else {
+                                showToast(data.message, 'error');
+                            }
+                        } catch (err) {
+                            showToast("Failed to trigger SMS simulation.", "error");
+                        }
+                    }
+                });
+            });
+
+            // -- Student Search Logic --
+            const searchInput = document.getElementById('searchStudent');
+            const studentTableBody = document.getElementById('student-table-body');
+
+            if (searchInput && studentTableBody) {
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase().trim();
+                    const rows = studentTableBody.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const text = row.innerText.toLowerCase();
+                        row.classList.toggle('d-none', !text.includes(term));
+                    });
+                });
+            }
+
+            // -- Notify Defaulters Logic --
+            const notifyBtn = document.getElementById('notifyDefaultersBtn');
+            if (notifyBtn) {
+                notifyBtn.addEventListener('click', () => {
+                    const rows = studentTableBody.querySelectorAll('tr');
+                    const defaulters = Array.from(rows).filter(row => {
+                        const status = row.querySelector('.badge-pill-custom').innerText.trim();
+                        return status === 'Unpaid' || status === 'Pending';
+                    });
+
+                    if (defaulters.length === 0) {
+                        showToast("No fee defaulters found.", "info");
+                        return;
+                    }
+
+                    if (confirm(`Send automated SMS reminders to ${defaulters.length} fee defaulters?`)) {
+                        showToast(`Queued SMS alerts for ${defaulters.length} students. (Simulation)`);
+                    }
+                });
+            }
+
+            // -- Device Reset Logic (Simplified) --
+            document.querySelectorAll('.reset-device-trigger').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const sid = btn.getAttribute('data-id');
+                    const sname = btn.getAttribute('data-name');
+
+                    if (confirm(`Are you sure to delete this user unique ID for ${sname}?`)) {
+                        try {
+                            const res = await fetch(`/api/reset-device/${sid}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ reason: 'Admin Reset' })
+                            });
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                showToast(data.message);
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                showToast(data.message, 'error');
+                            }
+                        } catch (err) {
+                            showToast("Security override failed. Try again.", "error");
+                        }
+                    }
+                });
+            });
+        });
+
+        // -- Global Visual Toast --
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-3 mb-2 rounded-4 shadow-lg text-white d-flex align-items-center animate__animated animate__fadeInRight`;
+            toast.style.background = type === 'error' ? '#ea4335' : '#34a853';
+            toast.style.minWidth = '300px';
+
+            toast.innerHTML = `
+                <div class="me-3 fs-3">
+                    <i class="bi bi-${type === 'error' ? 'shield-exclamation' : 'shield-check'}"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold uppercase">${type === 'error' ? 'ALERT' : 'SUCCESS'}</h6>
+                    <p class="mb-0 small">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
